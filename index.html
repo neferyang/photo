@@ -162,8 +162,11 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .sv-strip button[aria-current="true"]{opacity:1;box-shadow:0 0 0 2px var(--room),0 0 0 3px currentColor}
 .sv-strip img{height:100%;width:auto}
 .work figcaption{font:400 12.5px/1.5 var(--label);opacity:.62;margin-top:10px;font-variant-numeric:tabular-nums;letter-spacing:.03em}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;min-width:0}
-.grid button{aspect-ratio:1;overflow:hidden;background:color-mix(in srgb,var(--room-ink) 6%,var(--room))}
+/* 索引：等高對齊列，每格依照片原比例，不裁切 */
+.grid{--row:190px;display:flex;flex-wrap:wrap;gap:12px;min-width:0}
+.grid::after{content:"";flex-grow:999}
+.grid button{--r:1.5;flex:var(--r) 1 calc(var(--row) * var(--r));aspect-ratio:var(--r);overflow:hidden;background:color-mix(in srgb,var(--room-ink) 6%,var(--room))}
+.grid button.p{--r:.6667}
 .grid img{width:100%;height:100%;object-fit:cover}
 .next-room{grid-column:2;display:flex;justify-content:space-between;gap:16px;border-top:1px solid color-mix(in srgb,var(--room-ink) 25%,transparent);padding-top:18px;font-size:15px}
 .next-room a{text-decoration:none}
@@ -225,7 +228,7 @@ footer{padding-left:var(--edge-l);padding-right:var(--edge-r);padding-block:22px
   .brand .zh-name{font-size:18px}
   .covers{gap:14px}
   .pair{grid-template-columns:1fr}
-  .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .grid{--row:104px;gap:6px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -396,7 +399,7 @@ function hangHTML(s){
   return `<div class="hang">${out.join("")}</div>`;
 }
 function gridHTML(s){
-  return `<div class="grid">${[...s.shape].map((_,k)=>`<button type="button" data-i="${k+1}" aria-label="放大檢視第 ${k+1} 件"><img src="${src(s.id,k+1,true)}" alt="${s.t}，第 ${k+1} 件" loading="lazy"></button>`).join("")}</div>`;
+  return `<div class="grid">${[...s.shape].map((o,k)=>`<button type="button" class="${o==="P"?"p":""}" data-i="${k+1}" aria-label="放大檢視第 ${k+1} 件"><img src="${src(s.id,k+1,true)}" alt="${s.t}，第 ${k+1} 件" loading="lazy"></button>`).join("")}</div>`;
 }
 /* 單張輪播 */
 let svi = 1, svTimer = null;
