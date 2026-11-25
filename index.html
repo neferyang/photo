@@ -124,14 +124,19 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .room{background:var(--room);color:var(--room-ink)}
 .room-in{max-width:1400px;margin-inline:auto;padding-left:var(--gutter);padding-right:var(--gutter-r);padding-block:clamp(32px,6vw,80px) 96px;
   display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:clamp(28px,5vw,80px);align-items:start}
-.wall-text{position:sticky;top:96px}
+.wall-text{position:sticky;top:96px;grid-row:1 / span 3}
+.room-bar,#works,.next-room{grid-column:2}
+#works{min-width:0}
+.room-bar{display:flex;align-items:center;justify-content:flex-end;gap:8px 24px;flex-wrap:wrap;margin-bottom:clamp(-56px,-4vw,-24px)}
+.bar-title{display:none;margin:0;font-size:22px;letter-spacing:.14em;line-height:1.3}
+.bar-title span{font:400 13px/1 var(--label);letter-spacing:.04em;opacity:.65;margin-left:12px}
 .wall-text h1{font-weight:400;font-size:clamp(34px,4.4vw,54px);letter-spacing:.16em;line-height:1.25;margin:0}
 .wall-text .en{font:400 14px/1.4 var(--label);letter-spacing:.06em;opacity:.7;margin:6px 0 0}
 .wall-text .sub{font-size:15px;opacity:.75;margin:14px 0 0}
 .wall-text .stmt{margin-top:28px;font-size:15.5px;line-height:2;max-width:34em}
 .wall-text .stmt p{margin:0 0 1.1em;text-align:justify}
 .wall-text .meta{font:400 13px/1.7 var(--label);opacity:.7;border-top:1px solid color-mix(in srgb,var(--room-ink) 25%,transparent);padding-top:12px;margin-top:8px}
-.toggle{display:flex;gap:8px 20px;margin-top:18px;font-size:14px}
+.toggle{display:flex;gap:8px 20px;font-size:14px}
 .toggle button{min-height:44px;padding-bottom:2px;border-bottom:1px solid transparent;opacity:.65}
 .toggle button[aria-pressed="true"]{opacity:1;border-color:var(--mark)}
 .room-flower .toggle button[aria-pressed="true"]{border-color:#D9849A}
@@ -146,18 +151,30 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .work.solo{width:100%;max-width:calc(82vh * 1.5);margin-inline:auto}
 .work.solo.p{max-width:calc(82vh * .6667)}
 
-/* 單張輪播 */
-.sv{min-width:0;display:grid;gap:16px}
-.sv-stage{height:clamp(360px,calc(100vh - 320px),900px);display:flex;align-items:center;justify-content:center;touch-action:pan-y}
+/* 單張輪播：全寬版面 */
+.room.is-slide .room-in{max-width:1600px;grid-template-columns:minmax(0,1fr);row-gap:10px;padding-block:6px 96px}
+.room.is-slide .room-bar{order:1;justify-content:space-between;margin-bottom:0;border-bottom:1px solid color-mix(in srgb,var(--room-ink) 18%,transparent);padding-bottom:6px}
+.room.is-slide .bar-title{display:block}
+.room.is-slide #works{order:2}
+.room.is-slide .wall-text{order:3;position:static;grid-row:auto;max-width:44em;margin-top:40px}
+.room.is-slide .next-room{order:4}
+.room.is-slide .room-bar,.room.is-slide #works,.room.is-slide .next-room,.room.is-slide .wall-text{grid-column:1}
+.room.is-slide .sv-stage{height:max(300px,calc(100vh - 222px));height:max(300px,calc(100svh - 222px))}
+.sv{min-width:0;display:grid;gap:12px}
+.sv-stage{height:clamp(360px,calc(100vh - 320px),900px);height:clamp(360px,calc(100svh - 320px),900px);display:flex;align-items:center;justify-content:center;touch-action:pan-y;position:relative}
 .sv-open{height:100%;width:100%;display:flex;align-items:center;justify-content:center;cursor:zoom-in}
 .sv-open img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;transition:opacity .35s ease}
 .sv-open img.loading{opacity:.25}
-.sv-bar{display:flex;align-items:center;justify-content:center;gap:8px 28px;flex-wrap:wrap;font-size:14px}
+.sv-nav{position:absolute;top:50%;translate:0 -50%;width:48px;height:72px;display:grid;place-items:center;color:var(--room-ink);background:color-mix(in srgb,var(--room) 55%,transparent);opacity:.55;transition:opacity .2s,background-color .2s}
+.sv-nav:hover,.sv-nav:focus-visible{opacity:1;background:color-mix(in srgb,var(--room) 85%,transparent)}
+.sv-nav.prev{left:0}.sv-nav.next{right:0}
+.sv-foot{display:flex;align-items:center;gap:12px 20px;min-width:0}
+.sv-bar{display:flex;align-items:center;gap:4px 16px;flex:0 0 auto;font-size:14px}
 .sv-bar button{min-height:44px;padding:0 6px;border-bottom:1px solid transparent}
 .sv-bar button:hover{border-color:currentColor}
 .sv-count{font:400 13px/1 var(--label);font-variant-numeric:tabular-nums;opacity:.7;min-width:5.5em;text-align:center}
-.sv-strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
-.sv-strip button{flex:0 0 auto;height:64px;opacity:.45;outline-offset:2px;transition:opacity .2s}
+.sv-strip{display:flex;justify-content:safe center;gap:8px;overflow-x:auto;padding-block:3px;scrollbar-width:thin;flex:1 1 auto;min-width:0}
+.sv-strip button{flex:0 0 auto;height:52px;opacity:.45;outline-offset:2px;transition:opacity .2s}
 .sv-strip button:hover{opacity:.8}
 .sv-strip button[aria-current="true"]{opacity:1;box-shadow:0 0 0 2px var(--room),0 0 0 3px currentColor}
 .sv-strip img{height:100%;width:auto}
@@ -168,7 +185,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .grid button{--r:1.5;flex:var(--r) 1 calc(var(--row) * var(--r));aspect-ratio:var(--r);overflow:hidden;background:color-mix(in srgb,var(--room-ink) 6%,var(--room))}
 .grid button.p{--r:.6667}
 .grid img{width:100%;height:100%;object-fit:cover}
-.next-room{grid-column:2;display:flex;justify-content:space-between;gap:16px;border-top:1px solid color-mix(in srgb,var(--room-ink) 25%,transparent);padding-top:18px;font-size:15px}
+.next-room{display:flex;justify-content:space-between;gap:16px;border-top:1px solid color-mix(in srgb,var(--room-ink) 25%,transparent);padding-top:18px;font-size:15px}
 .next-room a{text-decoration:none}
 .next-room a:last-child{text-align:right}
 .next-room small{display:block;font:400 12px/1.4 var(--label);opacity:.6}
@@ -217,11 +234,18 @@ footer{padding-left:var(--edge-l);padding-right:var(--edge-r);padding-block:22px
   .intro-in{grid-template-columns:minmax(0,1fr)}
   .slides{height:auto;aspect-ratio:3/2}
   .room-in,.page{grid-template-columns:minmax(0,1fr)}
-  .wall-text{position:static}
-  .next-room{grid-column:1}
+  .wall-text{position:static;grid-row:auto}
+  .room-bar,#works,.next-room{grid-column:1}
+  .room-bar{justify-content:flex-start;margin-bottom:0}
   .trio{grid-template-columns:repeat(2,minmax(0,1fr))}
   .work.solo,.work.solo.p{max-width:none}
   .sv-stage{height:auto;aspect-ratio:4/5}
+  .room.is-slide .sv-stage{aspect-ratio:auto;height:min(max(300px,calc(100svh - 240px)),calc((100vw - 32px) * 1.5))}
+  .room.is-slide .sv-stage[data-o="L"]{height:calc((100vw - 32px) / 1.5)}
+  .sv-foot{flex-wrap:wrap}
+  .sv-strip{flex-basis:100%;justify-content:flex-start}
+  .sv-nav{width:40px;height:56px}
+  .bar-title span{display:none}
 }
 @media (max-width:480px){
   .brand .en-name{font-size:16px}
@@ -405,16 +429,22 @@ function gridHTML(s){
 let svi = 1, svTimer = null;
 function slideHTML(s){
   return `<div class="sv">
-    <div class="sv-stage" id="sv-stage"><button type="button" class="sv-open" id="sv-open" aria-label="放大檢視目前這張"><img id="sv-img" alt=""></button></div>
-    <div class="sv-bar"><button type="button" data-sv="-1">上一張</button><span class="sv-count" id="sv-count" aria-live="polite"></span><button type="button" data-sv="1">下一張</button><button type="button" id="sv-play">自動播放</button></div>
-    <div class="sv-strip" id="sv-strip">${[...s.shape].map((_,k)=>`<button type="button" data-k="${k+1}" aria-label="第 ${k+1} 張"><img src="${src(s.id,k+1,true)}" alt="" loading="lazy"></button>`).join("")}</div>
+    <div class="sv-stage" id="sv-stage">
+      <button type="button" class="sv-open" id="sv-open" aria-label="放大檢視目前這張"><img id="sv-img" alt=""></button>
+      <button type="button" class="sv-nav prev" data-sv="-1" aria-label="上一張"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button type="button" class="sv-nav next" data-sv="1" aria-label="下一張"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+    <div class="sv-foot">
+      <div class="sv-bar"><span class="sv-count" id="sv-count" aria-live="polite"></span><button type="button" id="sv-play">自動播放</button></div>
+      <div class="sv-strip" id="sv-strip">${[...s.shape].map((_,k)=>`<button type="button" data-k="${k+1}" aria-label="第 ${k+1} 張"><img src="${src(s.id,k+1,true)}" alt="" loading="lazy"></button>`).join("")}</div>
+    </div>
   </div>`;
 }
 function svShow(k){
   const s=current, n=s.shape.length; svi=(k-1+n)%n+1;
   const img=$("#sv-img"); if(!img) return;
   img.classList.add("loading"); img.onload=()=>img.classList.remove("loading");
-  img.src=src(s.id,svi); img.alt=`${s.t}，第 ${svi} 件`;
+  img.src=src(s.id,svi); img.alt=`${s.t}，第 ${svi} 件`; $("#sv-stage").dataset.o = s.shape[svi-1];
   $("#sv-count").textContent=`${pad(svi)} / ${pad(n)}`;
   const strip=$("#sv-strip");
   strip.querySelectorAll("[data-k]").forEach(b=>b.setAttribute("aria-current", +b.dataset.k===svi));
@@ -426,7 +456,7 @@ function svBump(){ if(svTimer && !svHold) svPlay(); }
 function svStop(){ clearInterval(svTimer); svTimer=null; svHold=false; const b=$("#sv-play"); if(b) b.textContent="自動播放"; }
 function svPlay(){ svStop(); svTimer=setInterval(()=>svShow(svi+1),5000); $("#sv-play").textContent="停止播放"; }
 function worksHTML(s){ return mode==="grid" ? gridHTML(s) : mode==="slide" ? slideHTML(s) : hangHTML(s); }
-function fillWorks(){ svStop(); $("#works").innerHTML = worksHTML(current); if(mode==="slide") svShow(1); }
+function fillWorks(){ svStop(); $("#v-room").classList.toggle("is-slide", mode==="slide"); $("#works").innerHTML = worksHTML(current); if(mode==="slide") svShow(1); }
 
 function renderRoom(s){
   current = s;
@@ -438,12 +468,15 @@ function renderRoom(s){
       <h1>${s.t}</h1><p class="en">${s.en}</p>${s.sub?`<p class="sub">又名〈${s.sub}〉</p>`:""}
       <div class="stmt">${s.stmt.map(p=>`<p>${esc(p)}</p>`).join("")}</div>
       <p class="meta">${s.shape.length} 件．${esc(s.meta)}</p>
+    </aside>
+    <div class="room-bar">
+      <p class="bar-title" aria-hidden="true">${s.t}<span>${s.en}</span></p>
       <div class="toggle" role="group" aria-label="檢視方式">
         <button type="button" data-mode="slide" aria-pressed="${mode==="slide"}">單張輪播</button>
         <button type="button" data-mode="hang" aria-pressed="${mode==="hang"}">全部</button>
         <button type="button" data-mode="grid" aria-pressed="${mode==="grid"}">索引</button>
       </div>
-    </aside>
+    </div>
     <div id="works"></div>
     <nav class="next-room" aria-label="下一間展廳"><a href="#home"><small>返回</small>展廳索引</a><a href="#${nx.id}"><small>下一間</small>${nx.t}</a></nav>
   </div>`;
