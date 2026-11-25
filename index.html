@@ -141,6 +141,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .wall-text .stmt p{margin:0 0 1.1em;text-align:justify}
 .wall-text .meta{font:400 13px/1.7 var(--label);opacity:.7;border-top:1px solid color-mix(in srgb,var(--room-ink) 25%,transparent);padding-top:12px;margin-top:8px}
 .toggle{display:flex;gap:8px 20px;font-size:14px}
+.more-btn{display:none;min-height:44px;font-size:14px;border-bottom:1px solid currentColor;opacity:.8}
 .toggle button{min-height:44px;padding-bottom:2px;border-bottom:1px solid transparent;opacity:.65}
 .toggle button[aria-pressed="true"]{opacity:1;border-color:var(--mark)}
 .room-flower .toggle button[aria-pressed="true"]{border-color:#D9849A}
@@ -239,9 +240,15 @@ footer{padding-left:var(--edge-l);padding-right:var(--edge-r);padding-block:22px
   .slides{height:auto;aspect-ratio:3/2}
   .room-in,.page{grid-template-columns:minmax(0,1fr)}
   .wall-text{position:static;grid-row:auto}
+  .stmt:not(.open){display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  .stmt:not(.open) p{display:inline}
+  .stmt:not(.open) p+p::before{content:" "}
+  .more-btn{display:inline-block}
+  .portrait{max-width:min(260px,70%)}
   .room-bar,#works,.next-room{grid-column:1}
   .room-bar{justify-content:flex-start;margin-bottom:0}
-  .trio{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hang-trio{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px 20px}
+  .trio{display:contents}
   .work.solo,.work.solo.p{max-width:none}
   .sv-stage{height:auto;aspect-ratio:4/5}
   .room.is-slide .sv-stage{aspect-ratio:auto;height:min(max(300px,calc(100svh - 240px)),calc((100vw - 32px) * 1.5))}
@@ -255,7 +262,9 @@ footer{padding-left:var(--edge-l);padding-right:var(--edge-r);padding-block:22px
   .brand .en-name{font-size:16px}
   .brand .zh-name{font-size:18px}
   .covers{gap:14px}
-  .pair{grid-template-columns:1fr}
+  .pair{grid-template-columns:1fr;gap:48px}
+  .hang-trio{grid-template-columns:1fr;gap:48px}
+  .hang{gap:48px}
   .grid{--row:104px;gap:6px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -424,7 +433,7 @@ function hangHTML(s){
       else { out.push(fig(s,i,"solo")); i++; }
     }
   }
-  return `<div class="hang">${out.join("")}</div>`;
+  return `<div class="hang hang-${s.hang}">${out.join("")}</div>`;
 }
 function gridHTML(s){
   return `<div class="grid">${[...s.shape].map((o,k)=>`<button type="button" class="${o==="P"?"p":""}" data-i="${k+1}" aria-label="放大檢視第 ${k+1} 件"><img src="${src(s.id,k+1,true)}" alt="${s.t}，第 ${k+1} 件" loading="lazy"></button>`).join("")}</div>`;
@@ -470,7 +479,8 @@ function renderRoom(s){
   v.innerHTML = `<div class="room-in">
     <aside class="wall-text">
       <h1>${s.t}</h1><p class="en">${s.en}</p>${s.sub?`<p class="sub">又名〈${s.sub}〉</p>`:""}
-      <div class="stmt">${s.stmt.map(p=>`<p>${esc(p)}</p>`).join("")}</div>
+      <div class="stmt" id="stmt">${s.stmt.map(p=>`<p>${esc(p)}</p>`).join("")}</div>
+      <button type="button" class="more-btn" id="more-btn" aria-expanded="false" aria-controls="stmt">閱讀全文</button>
       <p class="meta">${s.shape.length} 件．${esc(s.meta)}</p>
     </aside>
     <div class="room-bar">
@@ -491,6 +501,7 @@ $("#v-room").addEventListener("click", e=>{
   if(m){ mode = m.dataset.mode; try{localStorage.setItem("hang-mode",mode);}catch(err){}
     fillWorks();
     document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed", b===m)); return; }
+  if(e.target.closest("#more-btn")){ const open=$("#stmt").classList.toggle("open"); const b=$("#more-btn"); b.setAttribute("aria-expanded",open); b.textContent=open?"收合":"閱讀全文"; return; }
   const sv = e.target.closest("[data-sv]"); if(sv){ svShow(svi + +sv.dataset.sv); svBump(); return; }
   const k = e.target.closest("[data-k]"); if(k){ svShow(+k.dataset.k); svBump(); return; }
   if(e.target.closest("#sv-play")){ svTimer ? svStop() : svPlay(); return; }
