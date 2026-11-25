@@ -23,6 +23,8 @@
   --label:"Jost","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
   --gutter:max(16px,env(safe-area-inset-left,0px));
   --gutter-r:max(16px,env(safe-area-inset-right,0px));
+  --edge-l:max(var(--gutter),calc((100% - 1600px)/2 + 16px));
+  --edge-r:max(var(--gutter-r),calc((100% - 1600px)/2 + 16px));
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --wall:#191917;--ink:#E6E5DF;--ink-2:#9C9B94;--rule:#3A3A36;--plinth:#262623;--mark:#D9849A;color-scheme:dark}}
@@ -50,7 +52,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 
 /* 頁首 */
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--wall);
-  padding-left:max(var(--gutter),calc((100% - 1600px)/2 + 16px));padding-right:max(var(--gutter-r),calc((100% - 1600px)/2 + 16px));padding-block:16px;
+  padding-left:var(--edge-l);padding-right:var(--edge-r);padding-block:16px;
   display:flex;align-items:center;justify-content:space-between;gap:12px 28px;flex-wrap:wrap;border-bottom:1px solid var(--rule)}
 .brand{text-decoration:none;display:grid;gap:2px;line-height:1.2}
 .brand .en-name{font:400 19px/1.2 var(--label);letter-spacing:.02em}
@@ -113,7 +115,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .more{display:flex;gap:24px;flex-wrap:wrap;font-size:15px}
 .more a{text-decoration:none;border-bottom:1px solid var(--ink);padding-bottom:2px}
 .more a:hover{color:var(--mark);border-color:var(--mark)}
-.index h2,.sec-h{font-weight:400;font-size:15px;letter-spacing:.2em;color:var(--ink-2);margin:0 0 20px}
+.sec-h{font-weight:400;font-size:15px;letter-spacing:.2em;color:var(--ink-2);margin:0 0 20px}
 
 /* 展廳 */
 .room{background:var(--room);color:var(--room-ink)}
@@ -144,6 +146,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .grid img{width:100%;height:100%;object-fit:cover}
 .next-room{grid-column:2;display:flex;justify-content:space-between;gap:16px;border-top:1px solid color-mix(in srgb,var(--room-ink) 25%,transparent);padding-top:18px;font-size:15px}
 .next-room a{text-decoration:none}
+.next-room a:last-child{text-align:right}
 .next-room small{display:block;font:400 12px/1.4 var(--label);opacity:.6}
 
 /* 關於、聯絡 */
@@ -165,7 +168,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .btn:hover{background:var(--ink);color:var(--wall)}
 .hint{font-size:14px;color:var(--ink-2);min-height:1.9em;margin:14px 0 0}
 
-footer{padding-left:max(var(--gutter),calc((100% - 1600px)/2 + 16px));padding-right:max(var(--gutter-r),calc((100% - 1600px)/2 + 16px));padding-block:22px;border-top:1px solid var(--rule);
+footer{padding-left:var(--edge-l);padding-right:var(--edge-r);padding-block:22px;border-top:1px solid var(--rule);
   font:400 12.5px/1.6 var(--label);color:var(--ink-2);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
 /* 燈箱 */
@@ -305,6 +308,7 @@ const pad = n => String(n).padStart(2,"0");
 const src = (id,i,thumb) => `img/${thumb?"t/":""}${id}-${pad(i)}.jpg`;
 const $ = s => document.querySelector(s);
 const esc = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const label = (s,i) => `楊敏寬《${s.t}》${pad(i)} / ${pad(s.shape.length)}`;
 const COVER = {sakura:19, memory:8, people:5, flower:1};
 
 /* 作品系列 */
@@ -330,23 +334,24 @@ function show(k){
   const s = SLIDES[cur];
   $("#cap").innerHTML = `${s.cap}${s.where?`<span class="where">${s.where}</span>`:""}${s.link?`<a href="#${s.link}">進入展廳</a>`:""}`;
 }
-function play(){ auto = setInterval(()=>show(cur+1), 6500); const p=$("#pause"); if(p) p.textContent="暫停"; }
-function stop(){ clearInterval(auto); auto=null; const p=$("#pause"); if(p) p.textContent="播放"; }
+let paused = false;
+function play(){ clearInterval(auto); auto = setInterval(()=>show(cur+1), 6500); paused=false; const p=$("#pause"); if(p) p.textContent="暫停"; }
+function stop(){ clearInterval(auto); auto=null; paused=true; const p=$("#pause"); if(p) p.textContent="播放"; }
 $("#dots").addEventListener("click", e=>{
   const b = e.target.closest("button"); if(!b) return;
   if(b.id==="pause"){ auto ? stop() : play(); return; }
   show(+b.dataset.k); if(auto){ stop(); play(); }
 });
-show(0); if(!reduce) play();
+show(0);
 
 /* 展廳頁 */
 let current = null, mode = "hang";
 try{ mode = localStorage.getItem("hang-mode") || "hang"; }catch(e){}
 function fig(s,i,cls){
-  const o = s.shape[i-1]==="L" ? "1800\" height=\"1200" : "1200\" height=\"1800";
+  const [w,h] = s.shape[i-1]==="L" ? [1800,1200] : [1200,1800];
   return `<figure class="work ${cls||""}"><button type="button" data-i="${i}" aria-label="放大檢視 ${s.t} 第 ${i} 件">
-    <img src="${src(s.id,i)}" width="${o}" alt="${s.t}，第 ${i} 件" loading="lazy" decoding="async"></button>
-    <figcaption>楊敏寬《${s.t}》${pad(i)} / ${pad(s.shape.length)}</figcaption></figure>`;
+    <img src="${src(s.id,i)}" width="${w}" height="${h}" alt="${s.t}，第 ${i} 件" loading="lazy" decoding="async"></button>
+    <figcaption>${label(s,i)}</figcaption></figure>`;
 }
 function hangHTML(s){
   const out=[]; const n=s.shape.length;
@@ -380,12 +385,14 @@ function renderRoom(s){
       </div>
     </aside>
     <div id="works">${mode==="grid"?gridHTML(s):hangHTML(s)}</div>
-    <nav class="next-room" aria-label="下一間展廳"><a href="#home"><small>返回</small>展廳索引</a><a href="#${nx.id}" style="text-align:right"><small>下一間</small>${nx.t}</a></nav>
+    <nav class="next-room" aria-label="下一間展廳"><a href="#home"><small>返回</small>展廳索引</a><a href="#${nx.id}"><small>下一間</small>${nx.t}</a></nav>
   </div>`;
 }
 $("#v-room").addEventListener("click", e=>{
   const m = e.target.closest("[data-mode]");
-  if(m){ mode = m.dataset.mode; try{localStorage.setItem("hang-mode",mode);}catch(err){} renderRoom(current); return; }
+  if(m){ mode = m.dataset.mode; try{localStorage.setItem("hang-mode",mode);}catch(err){}
+    $("#works").innerHTML = mode==="grid" ? gridHTML(current) : hangHTML(current);
+    document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed", b===m)); return; }
   const b = e.target.closest("[data-i]");
   if(b) openLB(+b.dataset.i, b);
 });
@@ -393,7 +400,7 @@ $("#v-room").addEventListener("click", e=>{
 /* 燈箱 */
 let lbi = 1, opener = null;
 function showLB(){ const s=current; $("#lb-img").src = src(s.id,lbi); $("#lb-img").alt = `${s.t}，第 ${lbi} 件`;
-  $("#lb-cap").textContent = `楊敏寬《${s.t}》${pad(lbi)} / ${pad(s.shape.length)}`; }
+  $("#lb-cap").textContent = label(s,lbi); }
 function openLB(i,el){ lbi=i; opener=el; showLB(); $("#lb").hidden=false; document.body.style.overflow="hidden"; $("#lb-close").focus(); }
 function closeLB(){ $("#lb").hidden=true; document.body.style.overflow=""; opener && opener.focus(); }
 function move(d){ const n=current.shape.length; lbi = (lbi-1+d+n)%n+1; showLB(); }
@@ -414,13 +421,17 @@ $("#copy").onclick = ()=>{
 $("#yr").textContent = new Date().getFullYear();
 
 /* 路由 */
+const STATIC = ["home","about","contact"];
 function route(){
   const h = location.hash.slice(1) || "home";
   if(!$("#lb").hidden) closeLB();
   document.querySelectorAll(".view").forEach(v=>v.classList.remove("on"));
   const s = SERIES.find(x=>x.id===h);
   if(s){ renderRoom(s); document.title = `${s.t}｜楊敏寬 攝影`; }
-  else { const v = $("#v-"+h) || $("#v-home"); v.classList.add("on"); document.title = "楊敏寬 攝影"; }
+  else { const v = document.getElementById("v-"+(STATIC.includes(h)?h:"home")); v.classList.add("on"); document.title = "楊敏寬 攝影"; }
+  const onHome = !s && (h==="home" || !STATIC.includes(h));
+  clearInterval(auto); auto = null;
+  if(onHome && !reduce && !paused) auto = setInterval(()=>show(cur+1), 6500);
   document.querySelectorAll(".nav a").forEach(a=>{ if(a.getAttribute("href")==="#"+h) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
   scrollTo(0,0);
 }
